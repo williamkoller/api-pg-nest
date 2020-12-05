@@ -4,9 +4,9 @@
 
 > Crypto
 
-> class-validator
+> Class Validator
 
-> class-transformer
+> Class Transformer
 
 > PostgreSQL
 
