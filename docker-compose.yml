@@ -1,0 +1,16 @@
+version: '3'
+
+services:
+  db_pg:
+    image: postgres:12
+    ports:
+      - 5433:5432
+    restart: always
+    volumes: 
+      - pgsql-data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root    
+
+volumes:
+  pgsql-data:
