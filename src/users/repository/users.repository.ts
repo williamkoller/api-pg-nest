@@ -5,6 +5,7 @@ import { ConflictException, InternalServerErrorException } from '@nestjs/common'
 import { EntityRepository, Repository } from 'typeorm'
 import * as crypto from 'crypto'
 import * as bcrypt from 'bcrypt'
+import { CredentialsDto } from 'src/auth/dtos/credentials-dto'
 
 @EntityRepository(User)
 export class UserRepository extends Repository<User> {
@@ -30,6 +31,17 @@ export class UserRepository extends Repository<User> {
             } else {
                 throw new InternalServerErrorException('Error on save user Database.')
             }
+        }
+    }
+
+    async checkCredentials(credentilasDto: CredentialsDto): Promise<User> {
+        const { email, password } = credentilasDto
+        const user = await this.findOne({ email, status: true })
+
+        if (user && (await user.checkPassword(password))) {
+            return user
+        } else {
+            return null
         }
     }
 
