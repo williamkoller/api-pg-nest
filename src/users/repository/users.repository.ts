@@ -6,9 +6,40 @@ import { EntityRepository, Repository } from 'typeorm'
 import * as crypto from 'crypto'
 import * as bcrypt from 'bcrypt'
 import { CredentialsDto } from 'src/auth/dtos/credentials-dto'
+import { FindUsersQueryDto } from '../dtos/find-users-query.dto'
 
 @EntityRepository(User)
 export class UserRepository extends Repository<User> {
+    async findUsers(queryDto: FindUsersQueryDto): Promise<{ users: User[]; total: number }> {
+        queryDto.status = queryDto.status === undefined ? true : queryDto.status
+        queryDto.page = queryDto.page < 1 ? 1 : queryDto.page
+        queryDto.limit = queryDto.limit > 100 ? 100 : queryDto.limit
+
+        const { email, name, role, status } = queryDto
+        const query = this.createQueryBuilder('user')
+        query.where('user.status = :status', { status })
+
+        if (email) {
+            query.andWhere('user.email ILIKE :email', { email: `%${email}%` })
+        }
+
+        if (name) {
+            query.andWhere('user.name ILIKE :name', { name: `%${name}%` })
+        }
+
+        if (role) {
+            query.andWhere('user.role = :role', { role })
+        }
+        query.skip((queryDto.page - 1) * queryDto.limit)
+        query.take(+queryDto.limit)
+        query.orderBy(queryDto.sort ? JSON.stringify(queryDto.sort) : undefined)
+        query.select(['user.name', 'user.email', 'user.role', 'user.status'])
+        const [users, total] = await query.getManyAndCount()
+        return {
+            users,
+            total,
+        }
+    }
     async createUser(createUserDto: CreateUserDto, role: UserRole): Promise<User> {
         const { email, name, password } = createUserDto
         const user = this.create()
