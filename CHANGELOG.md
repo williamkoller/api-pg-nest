@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 # [Unreleased]
 
+# Release [v0.0.2] 12-05-2020
+
+# Added
+
+-   Add class ReturnFindUsersQueryDto
+
 # Release [v0.0.1] 12-05-2020
 
 # Added
