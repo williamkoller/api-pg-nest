@@ -1,10 +1,10 @@
+import { User } from '../entity/user.entity'
+import { CreateUserDto } from '../dtos/create-user.dto'
+import { UserRole } from '../user-enum/user-role.enum'
+import { ConflictException, InternalServerErrorException } from '@nestjs/common'
 import { EntityRepository, Repository } from 'typeorm'
-import { User } from './user.entity'
-import { CreateUserDto } from './create-user.dto'
-import { UserRole } from './user-role.enum'
 import * as crypto from 'crypto'
 import * as bcrypt from 'bcrypt'
-import { ConflictException, InternalServerErrorException } from '@nestjs/common'
 
 @EntityRepository(User)
 export class UserRepository extends Repository<User> {
