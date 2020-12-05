@@ -1,6 +1,6 @@
-import { FindUsersQueryDto } from './find-users-query.dto'
+import { User } from '../entity/user.entity'
 
-export class ReturnfindUsersQueryDto {
-    found: FindUsersQueryDto
+export class ReturnFindUsersQueryDto {
+    found: { users: User[]; total: number }
     message: string
 }

@@ -22,6 +22,7 @@ import { GetUser } from 'src/auth/decorator/get-user.decorator'
 import { User } from './entity/user.entity'
 import { ReturnMessageDto } from './dtos/return-message.dto'
 import { FindUsersQueryDto } from './dtos/find-users-query.dto'
+import { ReturnFindUsersQueryDto } from './dtos/return-find-users-query.dto'
 
 @Controller('api/v1/users')
 @UseGuards(AuthGuard(), RolesGuard)
@@ -38,7 +39,7 @@ export class UsersController {
         }
     }
 
-    @Get('/admin/list-by-id/:id')
+    @Get('/admin/find-user-by-id/:id')
     @Role(UserRole.ADMIN)
     async findUserByID(@Param('id') id: string): Promise<ReturnUserDto> {
         const user = await this.usersService.findUserById(id)
@@ -61,7 +62,7 @@ export class UsersController {
         }
     }
 
-    @Delete('/admin/delete/:id')
+    @Delete('/admin/delete-user/:id')
     @Role(UserRole.ADMIN)
     async deleteUser(@Param('id') id: string): Promise<ReturnMessageDto> {
         await this.usersService.deleteUser(id)
@@ -72,7 +73,7 @@ export class UsersController {
 
     @Get('/admin/list-all')
     @Role(UserRole.ADMIN)
-    async findUsers(@Query() query: FindUsersQueryDto) {
+    async findUsers(@Query() query: FindUsersQueryDto): Promise<ReturnFindUsersQueryDto> {
         const found = await this.usersService.findUsers(query)
         return {
             found,
