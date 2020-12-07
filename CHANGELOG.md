@@ -10,6 +10,9 @@ All notable changes to this project will be documented in this file.
 
 -   Add class ReturnFindUsersQueryDto
 -   Add Winston custom Logger
+-   Add Reset Password
+-   Add recoverToken
+-   Add sendRecoverPasswordEmail with Mailer
 
 # Release [v0.0.1] 12-05-2020
 
