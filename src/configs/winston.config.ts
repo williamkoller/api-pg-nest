@@ -9,8 +9,14 @@ export const winstonConfig: WinstonModuleOptions = {
     },
     transports: [
         new winston.transports.Console({
-            format: winston.format.combine(winston.format.timestamp(), nestWinstonModuleUtilities.format.nestLike()),
-            level: 'info',
+            format: winston.format.combine(
+                winston.format.timestamp(),
+                nestWinstonModuleUtilities.format.nestLike(),
+                winston.format.colorize({ all: true }),
+                winston.format.printf((msg) => {
+                    return `${msg.timestamp} [${msg.level}] - ${msg.message}`
+                }),
+            ),
         }),
         new winston.transports.File({
             level: 'verbose',
