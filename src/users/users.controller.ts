@@ -21,7 +21,7 @@ import { UpdateUserDto } from './dtos/update-users.dto'
 import { GetUser } from 'src/auth/decorator/get-user.decorator'
 import { User } from './entity/user.entity'
 import { ReturnMessageDto } from './dtos/return-message.dto'
-import { FindUsersQueryDto } from './dtos/find-users-query.dto'
+import { FindUsersQueryDto } from './dtos/find-users.query.dto'
 import { ReturnFindUsersQueryDto } from './dtos/return-find-users-query.dto'
 
 @Controller('api/v1/users')
