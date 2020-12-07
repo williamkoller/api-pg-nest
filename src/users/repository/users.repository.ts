@@ -6,7 +6,7 @@ import { EntityRepository, Repository } from 'typeorm'
 import * as crypto from 'crypto'
 import * as bcrypt from 'bcrypt'
 import { CredentialsDto } from 'src/auth/dtos/credentials-dto'
-import { FindUsersQueryDto } from '../dtos/find-users-query.dto'
+import { FindUsersQueryDto } from '../dtos/find-users.query.dto'
 
 @EntityRepository(User)
 export class UserRepository extends Repository<User> {
@@ -63,6 +63,14 @@ export class UserRepository extends Repository<User> {
                 throw new InternalServerErrorException('Error on save user Database.')
             }
         }
+    }
+
+    async changePassword(id: string, password: string): Promise<void> {
+        const user = await this.findOne(id)
+        user.salt = await bcrypt.genSalt()
+        user.password = await this.hashPassword(password, user.salt)
+        user.recoverToken = null
+        await user.save()
     }
 
     async checkCredentials(credentilasDto: CredentialsDto): Promise<User> {
