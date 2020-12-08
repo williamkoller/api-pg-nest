@@ -1,6 +1,6 @@
-import { MailerService } from '@nestjs-modules/mailer'
 import {
     Injectable,
+    InternalServerErrorException,
     NotAcceptableException,
     NotFoundException,
     UnauthorizedException,
@@ -15,6 +15,7 @@ import { UserRepository } from 'src/users/repository/users.repository'
 import { UserRole } from 'src/users/user-enum/user-role.enum'
 import { ChangePasswordDto } from './dtos/change-password.dto'
 import { CredentialsDto } from './dtos/credentials-dto'
+import { MailerService } from '@nestjs-modules/mailer'
 
 @Injectable()
 export class AuthService {
@@ -26,22 +27,27 @@ export class AuthService {
     ) {}
 
     async signUp(createdUserDto: CreateUserDto): Promise<User> {
-        if (createdUserDto.password != createdUserDto.passwordConfirmation) {
-            throw new UnprocessableEntityException('The passwods not matchs.')
-        } else {
-            const user = await this.userRepository.createUser(createdUserDto, UserRole.USER)
+        try {
+            if (createdUserDto.password != createdUserDto.passwordConfirmation) {
+                throw new UnprocessableEntityException('The passwods not matchs.')
+            } else {
+                const user = await this.userRepository.createUser(createdUserDto, UserRole.USER)
 
-            const mail = {
-                to: user.email,
-                from: 'williamkoller404@gmail.com',
-                subject: 'Email de confirmação',
-                template: 'email-confirmation',
-                context: {
-                    token: user.confirmationToken ? user.confirmationToken : null,
-                },
+                const mail = {
+                    to: user.email,
+                    from: 'noreply@application.com',
+                    subject: 'Email de confirmação',
+                    template: 'email-confirmation',
+                    context: {
+                        token: user.confirmationToken,
+                    },
+                }
+                await this.mailerService.sendMail(mail)
+                return user
             }
-            await this.mailerService.sendMail(mail)
-            return user
+        } catch (error) {
+            console.log(error)
+            throw new InternalServerErrorException(error)
         }
     }
 
@@ -75,24 +81,29 @@ export class AuthService {
     }
 
     async sendRecoverPasswordEmail(email: string): Promise<void> {
-        const user = await this.userRepository.findOne({ email })
-        if (!user) {
-            throw new NotFoundException('There is no user found with this email.')
-        }
+        try {
+            const user = await this.userRepository.findOne({ email })
+            if (!user) {
+                throw new NotFoundException('There is no user found with this email.')
+            }
 
-        user.recoverToken = randomBytes(32).toString('hex')
-        await user.save()
+            user.recoverToken = randomBytes(32).toString('hex')
+            await user.save()
 
-        const mail = {
-            to: user.email,
-            from: 'williamkoller404@gmail.com',
-            subject: 'Recuperação de senha',
-            template: 'recover-password',
-            context: {
-                token: user.recoverToken,
-            },
+            const mail = {
+                to: user.email,
+                from: 'noreply@application.com',
+                subject: 'Recuperação de senha',
+                template: 'recover-password',
+                context: {
+                    token: user.recoverToken,
+                },
+            }
+            await this.mailerService.sendMail(mail)
+        } catch (error) {
+            console.log(error)
+            throw new InternalServerErrorException(error)
         }
-        await this.mailerService.sendMail(mail)
     }
 
     async changePassword(id: string, changePasswordDto: ChangePasswordDto): Promise<void> {
