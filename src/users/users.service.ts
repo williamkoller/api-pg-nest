@@ -1,9 +1,4 @@
-import {
-    Injectable,
-    InternalServerErrorException,
-    NotFoundException,
-    UnprocessableEntityException,
-} from '@nestjs/common'
+import { Injectable, NotFoundException, UnprocessableEntityException } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { CreateUserDto } from './dtos'
 import { UserRole } from './user-enum/user-role.enum'
@@ -33,17 +28,12 @@ export class UsersService {
     }
 
     async updateUser(updateUserDto: UpdateUserDto, id: string): Promise<User> {
-        const user = await this.findUserById(id)
-        const { name, email, role, status } = updateUserDto
-        user.name = name ? name : user.name
-        user.email = email ? email : user.email
-        user.role = role ? role : user.role
-        user.status = status === undefined ? user.status : status
-        try {
-            await user.save()
+        const result = await this.userRepository.update({ id }, updateUserDto)
+        if (result.affected > 0) {
+            const user = await this.findUserById(id)
             return user
-        } catch (error) {
-            throw new InternalServerErrorException('Error on save data in Database.')
+        } else {
+            throw new NotFoundException('User not found')
         }
     }
 
