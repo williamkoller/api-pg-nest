@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 
 # [Unreleased]
 
+# Added
+
+-   Add Testing Layer UsersService
+
 # Release [v0.0.3] 12-07-2020
 
 # Added
